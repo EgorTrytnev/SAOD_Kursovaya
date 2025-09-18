@@ -21,15 +21,12 @@ using namespace std;
 const int TOTAL_RECORDS = 4000;
 const int PAGE_SIZE = 20;
 
-// Функция для получения полного года из даты рождения
 int getYearFromBirthdate(const char* birthdate) {
-    // формат "дд-мм-гг", берем последние два символа для года
     int year = (birthdate[6] - '0') * 10 + (birthdate[7] - '0');
-    if (year < 50) {
-        year += 2000; // для годов после 2000
-    } else {
+    if (year < 50) 
+        year += 2000; 
+    else 
         year += 1900;
-    }
     return year;
 }
 
@@ -68,7 +65,6 @@ void heapSort(vector<Record*>& arr) {
     }
 }
 
-// Загрузка записей из файла в массив указателей
 bool loadDatabase(const char* filename, vector<Record*>& records) {
     ifstream file(filename, ios::binary);
     if (!file.is_open()) {
