@@ -106,15 +106,15 @@ void printPage(const vector<Record*>& records, int page) {
         return;
     }
     if (end > (int)records.size()) end = (int)records.size();
-    cout << "Страница " << (page + 1) << ":" << endl;
+    cout << "Page " << (page + 1) << ":" << endl;
     for (int i = start; i < end; ++i) {
-        cout << i + 1 << ". ФИО: ";
+        cout << i + 1 << ". name ";
         printCharArray(records[i]->fio, 30);
-        cout << ", Отдел: " << records[i]->department << ", Должность: ";
+        cout << ", department: " << records[i]->department << ", post: ";
         printCharArray(records[i]->position, 22);
-        cout << ", Дата рождения: ";
+        cout << ", Date of birthday: ";
         printCharArray(records[i]->birthdate, 10);
-        cout << " (год " << getYearFromBirthdate(records[i]->birthdate) << ")" << endl;
+        cout << " (Year " << getYearFromBirthdate(records[i]->birthdate) << ")" << endl;
     }
 }
 
