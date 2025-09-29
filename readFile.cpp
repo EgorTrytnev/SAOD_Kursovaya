@@ -7,14 +7,12 @@
 #include <windows.h>
 #endif
 
-#pragma pack(push, 1)
 struct Record {
     char fio[30];
     uint16_t department;
     char position[22];
     char birthdate[10]; // формат дд-мм-гг
 };
-#pragma pack(pop)
 
 using namespace std;
 
