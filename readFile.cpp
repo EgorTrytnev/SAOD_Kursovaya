@@ -129,7 +129,7 @@ int main() {
 
     do {
         printPage(records, currentPage);
-        cout << "Показать следующую страницу? (y/n): ";
+        cout << "Show next page? (y/n): ";
         cin >> choice;
         if (choice == 'y' || choice == 'Y') {
             currentPage++;
@@ -138,13 +138,13 @@ int main() {
         }
     } while ((currentPage * PAGE_SIZE) < (int)records.size());
 
-    cout << "Сортируем по году рождения..." << endl;
+    cout << "Sort by birthday year..." << endl;
     heapSort(records);
 
     currentPage = 0;
     do {
         printPage(records, currentPage);
-        cout << "Показать следующую страницу? (y/n): ";
+        cout << "Show next page? (y/n): ";
         cin >> choice;
         if (choice == 'y' || choice == 'Y') {
             currentPage++;
