@@ -1,8 +1,9 @@
-// MyQueue.h
 #pragma once
+
 #include <cstddef>
 #include <utility>
 #include <stdexcept>
+
 using std::swap;
 
 template <typename T>
@@ -12,7 +13,7 @@ public:
 
     ~MyQueue() { delete[] data_; }
 
-        MyQueue(const MyQueue& other)
+    MyQueue(const MyQueue& other)
         : data_(nullptr), cap_(0), head_(0), tail_(0), size_(0) {
         if (other.size_ == 0) return;
         cap_ = other.size_;
@@ -76,7 +77,6 @@ public:
     }
 
     bool empty() const noexcept { return size_ == 0; }
-
     size_t size() const noexcept { return size_; }
 
 private:
@@ -87,13 +87,17 @@ private:
             head_ = tail_ = size_ = 0;
             return;
         }
+
         if (desired <= cap_) return;
+
         size_t newCap = cap_ * 2;
         while (newCap < desired) newCap *= 2;
+
         T* nd = new T[newCap];
         for (size_t i = 0; i < size_; ++i) {
             nd[i] = std::move(data_[(head_ + i) % cap_]);
         }
+
         delete[] data_;
         data_ = nd;
         cap_ = newCap;

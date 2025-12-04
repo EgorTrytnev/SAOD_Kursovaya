@@ -1,9 +1,10 @@
 #include <iostream>
 #include <vector>
-#include <cstdlib>
-#include <ctime>
-#include <iomanip>
+#include <queue>
+#include <algorithm>
+
 using namespace std;
+
 struct Node {
     int data{};
     int h{};
@@ -20,11 +21,7 @@ void seth(Node* p);
 void LRprint(Node* x, int level);
 void destroy(Node* p);
 
-
-
-
 Node* root = nullptr;
-
 static int N = 0;
 vector<int> mas, W;
 vector<vector<int>> AW, AP, AR;
@@ -44,7 +41,10 @@ void build_tree() {
     AW_();
     AP_AR_();
     create_tree(0, N);
-    if (root) { root->h = 1; seth(root); }
+    if (root) {
+        root->h = 1;
+        seth(root);
+    }
 }
 
 bool bst_contains_value(Node* p, int key) {
@@ -54,12 +54,18 @@ bool bst_contains_value(Node* p, int key) {
     return bst_contains_value(p->right, key);
 }
 
-bool contains_key(int key) { return bst_contains_value(root, key); }
-void print_inorder() { LRprint(root, 0); }
-void destroy_tree() { destroy(root); root = nullptr; }
+bool contains_key(int key) {
+    return bst_contains_value(root, key);
+}
 
+void print_inorder() {
+    LRprint(root, 0);
+}
 
-int csum = 0;
+void destroy_tree() {
+    destroy(root);
+    root = nullptr;
+}
 
 void AW_() {
     for (int i = 0; i <= N; ++i) {
@@ -76,15 +82,21 @@ void AP_AR_() {
         AP[i][j] = AW[i][j];
         AR[i][j] = j;
     }
+
     for (int H = 2; H <= N; ++H) {
         for (int i = 0; i <= N - H; ++i) {
             int j = i + H;
             int m = AR[i][j - 1];
             int best = AP[i][m - 1] + AP[m][j];
+
             for (int k = m + 1; k <= AR[i + 1][j]; ++k) {
                 int val = AP[i][k - 1] + AP[k][j];
-                if (val < best) { best = val; m = k; }
+                if (val < best) {
+                    best = val;
+                    m = k;
+                }
             }
+
             AP[i][j] = best + AW[i][j];
             AR[i][j] = m;
         }
@@ -98,8 +110,11 @@ void add(Node*& p, int x, int w) {
         p->w = w;
         return;
     }
-    if (mas[x - 1] < p->data) add(p->left, x, w);
-    else add(p->right, x, w);
+
+    if (mas[x - 1] < p->data)
+        add(p->left, x, w);
+    else
+        add(p->right, x, w);
 }
 
 void create_tree(int L, int R) {
@@ -113,34 +128,20 @@ void create_tree(int L, int R) {
 
 void seth(Node* p) {
     if (!p) return;
-    if (p->left)  { p->left->h  = p->h + 1; }
-    if (p->right) { p->right->h = p->h + 1; }
+    if (p->left) {
+        p->left->h = p->h + 1;
+    }
+    if (p->right) {
+        p->right->h = p->h + 1;
+    }
     seth(p->left);
     seth(p->right);
-}
-
-void midh(Node* p) {
-    if (!p) return;
-    csum += p->w * p->h;
-    midh(p->left);
-    midh(p->right);
-}
-
-int size(Node* p) {
-    if (!p) return 0;
-    return 1 + size(p->left) + size(p->right);
-}
-
-long long summ(Node* p) {
-    if (!p) return 0;
-    return p->data + summ(p->left) + summ(p->right);
 }
 
 void LRprint(Node* x, int level) {
     if (!x) return;
     LRprint(x->left, level + 1);
-    cout << "Key = " << x->data << ", Weight = " << x->w << '\n';
-    
+    cout << "Key = " << x->data << ", Weight = " << x->w << ", Height = " << x->h << '\n';
     LRprint(x->right, level + 1);
 }
 
@@ -150,4 +151,3 @@ void destroy(Node* p) {
     destroy(p->right);
     delete p;
 }
-
