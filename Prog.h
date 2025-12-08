@@ -35,16 +35,19 @@ int lowerBoundByYear(const vector<Record*>& records, int year);
 int upperBoundExclusiveByYear(const vector<Record*>& records, int year);
 void printQueue(MyQueue<Record*> q);
 
+// Структура для узла Хаффмена
 struct HuffmanNode {
     char ch;
     int freq;
     HuffmanNode* left;
     HuffmanNode* right;
-    HuffmanNode(char c, int f) : ch(c), freq(f), left(nullptr), right(nullptr) {}
+    
+    HuffmanNode(char ch, int freq) : ch(ch), freq(freq), left(nullptr), right(nullptr) {}
 };
 
+// Компаратор для priority_queue
 struct CompareNode {
-    bool operator()(HuffmanNode* a, HuffmanNode* b) {
+    bool operator()(HuffmanNode* a, HuffmanNode* b) const {
         return a->freq > b->freq;
     }
 };

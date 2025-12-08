@@ -1,4 +1,7 @@
 #include "Prog.h"
+#include <queue>
+#include <algorithm>
+
 
 int getYearFromBirthdate(const char* birthdate) {
     int year = (birthdate[6] - '0') * 10 + (birthdate[7] - '0');
@@ -157,7 +160,30 @@ void printQueue(MyQueue<Record*> q) {
     }
 }
 
+
+
+void generateCodes(HuffmanNode* root, const string& code, unordered_map<char, string>& codes) {
+    if (!root) return;
+    
+    // Если это листовой узел (содержит символ)
+    if (!root->left && !root->right) {
+        codes[root->ch] = code.empty() ? "0" : code;
+        return;
+    }
+    
+    generateCodes(root->left, code + "0", codes);
+    generateCodes(root->right, code + "1", codes);
+}
+
+void destroyHuffmanTree(HuffmanNode* node) {
+    if (!node) return;
+    destroyHuffmanTree(node->left);
+    destroyHuffmanTree(node->right);
+    delete node;
+}
+
 void buildHuffmanTree(const vector<Record*>& records, unordered_map<char, string>& codes) {
+    // Подсчитываем частоты символов
     unordered_map<char, int> freq;
     
     for (const auto& rec : records) {
@@ -166,41 +192,49 @@ void buildHuffmanTree(const vector<Record*>& records, unordered_map<char, string
         for (int i = 0; i < 10; ++i) if (rec->birthdate[i] != '\0') freq[rec->birthdate[i]]++;
     }
     
-    //Вот это нужно будет глянуть
+    // Если нет символов, выходим
+    if (freq.empty()) {
+        return;
+    }
+    
+    // Если только один уникальный символ
+    if (freq.size() == 1) {
+        codes[freq.begin()->first] = "0";
+        return;
+    }
+    
+    // Создаём приоритетную очередь с листовыми узлами
     priority_queue<HuffmanNode*, vector<HuffmanNode*>, CompareNode> pq;
     
     for (auto& p : freq) {
         pq.push(new HuffmanNode(p.first, p.second));
     }
     
+    // Строим дерево Хаффмена
     while (pq.size() > 1) {
-        HuffmanNode* left = pq.top(); pq.pop();
-        HuffmanNode* right = pq.top(); pq.pop();
+        HuffmanNode* left = pq.top();
+        pq.pop();
         
+        HuffmanNode* right = pq.top();
+        pq.pop();
+        
+        // Создаём внутренний узел с суммарной частотой
         HuffmanNode* parent = new HuffmanNode('\0', left->freq + right->freq);
         parent->left = left;
         parent->right = right;
+        
         pq.push(parent);
     }
     
-    HuffmanNode* root = pq.empty() ? nullptr : pq.top();
+    // Получаем корень дерева
+    HuffmanNode* root = pq.top();
+    pq.pop();
     
+    // Генерируем коды
     if (root) {
         generateCodes(root, "", codes);
         destroyHuffmanTree(root);
     }
-}
-
-void generateCodes(HuffmanNode* root, const string& code, unordered_map<char, string>& codes) {
-    if (!root) return;
-    
-    if (!root->left && !root->right) {
-        codes[root->ch] = code.empty() ? "0" : code;
-        return;
-    }
-    
-    generateCodes(root->left, code + "0", codes);
-    generateCodes(root->right, code + "1", codes);
 }
 
 double calculateEntropy(const vector<Record*>& records) {
@@ -243,13 +277,6 @@ double calculateAvgCodeLength(const vector<Record*>& records, const unordered_ma
     return avgLength;
 }
 
-void destroyHuffmanTree(HuffmanNode* node) {
-    if (!node) return;
-    destroyHuffmanTree(node->left);
-    destroyHuffmanTree(node->right);
-    delete node;
-}
-
 void saveCompressedDatabase(const char* filename, const vector<Record*>& records, const unordered_map<char, string>& codes) {
     ofstream file(filename, ios::binary);
     if (!file.is_open()) {
@@ -276,8 +303,10 @@ void saveCompressedDatabase(const char* filename, const vector<Record*>& records
         }
     }
     
+    // Дополняем нулями до полного байта
     while (encoded.length() % 8 != 0) encoded += "0";
     
+    // Записываем закодированные данные
     for (size_t i = 0; i < encoded.length(); i += 8) {
         char byte = 0;
         for (int j = 0; j < 8; ++j) {
