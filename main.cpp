@@ -1,18 +1,14 @@
 #include "Prog.h"
 
 extern void init_data(const std::vector<int>& keys, const std::vector<int>& weights);
-
 extern void build_tree();
-
 extern void print_inorder();
-
 extern bool contains_key(int key);
-
 extern void destroy_tree();
 
 void displayMenu() {
     cout << "\n" << string(50, '=') << "\n";
-    cout << " ГЛАВНОЕ МЕНЮ\n";
+    cout << "              ГЛАВНОЕ МЕНЮ\n";
     cout << string(50, '=') << "\n";
     cout << "1. Просмотр базы данных (постраничный просмотр)\n";
     cout << "2. Сортировка по году рождения (Heap Sort)\n";
@@ -31,17 +27,21 @@ int main() {
 #endif
 
     vector<Record*> records;
+    
     cout << "Загрузка базы данных..." << endl;
     if (!loadDatabase("base.dat", records)) {
         cout << "Ошибка: не удалось загрузить базу данных!" << endl;
         return 1;
     }
-
+    
     cout << "Загружено записей: " << records.size() << endl;
+
     int choice = 0;
     bool sorted = false;
+
     while (true) {
         displayMenu();
+        
         if (!(cin >> choice)) {
             cin.clear();
             cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
@@ -53,12 +53,14 @@ int main() {
             cout << "\n" << string(50, '=') << "\nПРОСМОТР БАЗЫ ДАННЫХ\n" << string(50, '=') << "\n";
             int currentPage = 0;
             char navChoice;
+            
             while (true) {
                 printPage(records, currentPage);
                 int totalPages = (records.size() + PAGE_SIZE - 1) / PAGE_SIZE;
                 cout << "\nСтраница " << (currentPage + 1) << " из " << totalPages << endl;
                 cout << "Команды: (n)ext, (p)revious, (q)uit: ";
                 cin >> navChoice;
+                
                 if (navChoice == 'n' || navChoice == 'N') {
                     if ((currentPage + 1) * PAGE_SIZE < (int)records.size()) {
                         currentPage++;
@@ -75,20 +77,24 @@ int main() {
                     break;
                 }
             }
-        } else if (choice == 2) {
+        }
+        else if (choice == 2) {
             cout << "\n" << string(50, '=') << "\nСОРТИРОВКА ПО ГОДУ РОЖДЕНИЯ\n" << string(50, '=') << "\n";
             cout << "Сортировка в процессе..." << endl;
             heapSort(records);
             cout << "Сортировка завершена!\n" << endl;
             sorted = true;
+            
             int currentPage = 0;
             char navChoice;
+            
             while (true) {
                 printPage(records, currentPage);
                 int totalPages = (records.size() + PAGE_SIZE - 1) / PAGE_SIZE;
                 cout << "\nСтраница " << (currentPage + 1) << " из " << totalPages << endl;
                 cout << "Команды: (n)ext, (p)revious, (q)uit: ";
                 cin >> navChoice;
+                
                 if (navChoice == 'n' || navChoice == 'N') {
                     if ((currentPage + 1) * PAGE_SIZE < (int)records.size()) {
                         currentPage++;
@@ -105,22 +111,25 @@ int main() {
                     break;
                 }
             }
-        } else if (choice == 3) {
+        }
+        else if (choice == 3) {
             if (!sorted) {
                 cout << "\nОшибка: сначала отсортируйте базу данных (опция 2)!" << endl;
                 continue;
             }
 
             cout << "\n" << string(50, '=') << "\nПОИСК ПО ГОДУ РОЖДЕНИЯ\n" << string(50, '=') << "\n";
+            
             while (true) {
                 cout << "Введите год рождения (или 0 для выхода): ";
                 int year;
+                
                 if (!(cin >> year)) {
                     cin.clear();
                     cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
                     continue;
                 }
-
+                
                 if (year == 0) break;
 
                 int left = lowerBoundByYear(records, year);
@@ -155,6 +164,7 @@ int main() {
                 }
 
                 std::sort(kv.begin(), kv.end());
+
                 std::vector<int> keys, weights;
                 for (auto& p : kv) {
                     keys.push_back(p.first);
@@ -163,18 +173,20 @@ int main() {
 
                 init_data(keys, weights);
                 build_tree();
+
                 std::cout << "\n" << string(50, '=') << "\nОПТИМАЛЬНОЕ B-ДЕРЕВО\n" << string(50, '=') << "\n";
                 print_inorder();
 
                 while (true) {
                     std::cout << "\nВведите номер отдела (или 0 для выхода): ";
                     int dept;
+                    
                     if (!(std::cin >> dept)) {
                         std::cin.clear();
                         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
                         continue;
                     }
-
+                    
                     if (dept == 0) break;
 
                     if (!contains_key(dept)) {
@@ -189,58 +201,82 @@ int main() {
                             qsub.push(r);
                         }
                     }
+
                     std::cout << "\nНайдено " << qsub.size() << " записей для отдела " << dept << ":" << std::endl;
                     printQueue(qsub);
                 }
 
                 destroy_tree();
+
                 cout << "\nПоиск завершен. Продолжить? (y/n): ";
                 char cont;
                 cin >> cont;
                 if (cont != 'y' && cont != 'Y') break;
             }
-        } else if (choice == 4) {
+        }
+        else if (choice == 4) {
             cout << "\nЭта опция интегрирована в опцию 3 (Поиск по году)" << endl;
             cout << "Для использования B-дерева:" << endl;
             cout << "1. Сначала отсортируйте базу данных (опция 2)" << endl;
             cout << "2. Затем выполните поиск по году (опция 3)" << endl;
             cout << "3. B-дерево будет построено автоматически" << endl;
-        } else if (choice == 5) {
-            cout << "\n" << string(90, '=') << "\n";
-            cout << setw(50) << "КОДИРОВАНИЕ И СЖАТИЕ ХАФФМАНА\n";
-            cout << string(90, '=') << "\n";
-            unordered_map<char, string> codes;
-            cout << "Построение дерева Хаффмена..." << endl;
-            buildHuffmanTree(records, codes);
-            cout << "Готово!\n" << endl;
-
-            // Получаем статистику
-            unordered_map<char, long long> freq;
-            long long totalChars = 0;
+        }
+        else if (choice == 5) {
+            cout << "\n" << string(90, '=') << "\nКОДИРОВАНИЕ ХАФФМАНА БАЗЫ ДАННЫХ\n" << string(90, '=') << "\n";
+            
+            // Подсчет частот из базы
+            int frequencies[MAX_SYMBOLS] = {0};
+            long long total_chars = 0;
             for (const auto& rec : records) {
-                for (int i = 0; i < 30; ++i) if (rec->fio[i] != '\0') { freq[rec->fio[i]]++; totalChars++; }
-                for (int i = 0; i < 22; ++i) if (rec->position[i] != '\0') { freq[rec->position[i]]++; totalChars++; }
-                for (int i = 0; i < 10; ++i) if (rec->birthdate[i] != '\0') { freq[rec->birthdate[i]]++; totalChars++; }
+                for (int i = 0; i < 30; i++) frequencies[(unsigned char)rec->fio[i]]++, total_chars++;
+                for (int i = 0; i < 22; i++) frequencies[(unsigned char)rec->position[i]]++, total_chars++;
+                for (int i = 0; i < 10; i++) frequencies[(unsigned char)rec->birthdate[i]]++, total_chars++;
             }
+            
+            int n = 0;
+            int m = 81;
+            SymbolData table[MAX_SYMBOLS + 1];
+            for (int i = 0; i < MAX_SYMBOLS; i++) {
+                if (frequencies[i] > 0) {
+                    n++;
+                    table[n].symbol = i;
+                    table[n].probability = (double)frequencies[i] / total_chars;
+                    table[n].code[0] = '\0';
+                    table[n].code_length = 0;
+                }
+            }
+            
+            // Сортировка по убыванию вероятностей
+            for (int i = 1; i <= n - 1; i++) {
+                for (int j = i + 1; j <= n; j++) {
+                    if (table[i].probability < table[j].probability) {
+                        SymbolData temp = table[i]; table[i] = table[j]; table[j] = temp;
+                    }
+                }
+            }
+            
+            cout << "Построение кодов Хаффмана..." << endl;
+            buildHuffmanCodes(table, n);
 
-            // Выводим таблицу кодов
-            printHuffmanTable(codes, freq, totalChars);
+            
+            double entropy = calculateEntropy(table, n);
+            printHuffmanTable(table, n);
+            printHuffmanAnalysis(table, n, entropy);
 
-            // Выводим анализ
-            printHuffmanAnalysis(records, codes);
+            cout << "\nОбщее количество символов в базе: " << total_chars << endl;
+            cout << "Количество уникальных символов: " << m << endl;
 
-            // Сжимаем базу данных
-            cout << "Сохранение сжатой базы данных..." << endl;
-            saveCompressedDatabase("base_compressed.dat", records, codes);
+            
+            saveCompressedDatabase("base_compressed.dat", records, table, n);
             double ratio = calculateCompressionRatio("base.dat", "base_compressed.dat");
+            cout << "Коэффициент сжатия: " << fixed << setprecision(2) << ratio << "%" << endl;
+        }
 
-            cout << "\n" << string(90, '=') << "\n";
-            cout << "Коэффициент сжатия: " << fixed << setprecision(2) << ratio << " %\n";
-            cout << string(90, '=') << "\n\n";
-        } else if (choice == 6) {
+        else if (choice == 6) {
             cout << "\nВыход из программы..." << endl;
             break;
-        } else {
+        }
+        else {
             cout << "\nНекорректный выбор!" << endl;
         }
     }
@@ -250,6 +286,7 @@ int main() {
         delete r;
     }
     records.clear();
+
     cout << "До свидания!" << endl;
     return 0;
 }

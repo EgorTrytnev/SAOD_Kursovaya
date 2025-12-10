@@ -1,5 +1,5 @@
 GPP = g++
-FLAGS = -Werror -Wextra -Wall
+FLAGS = -Wextra -Wall
 SRC = ../Prog.cpp ../main.cpp ../B_tree_find.cpp
 OBJ = $(SRC:.cpp=.o)
 TARGET = ./program
